@@ -1,0 +1,97 @@
+/* Google Fonts — Space Grotesk (headings) + Inter (body) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans text-surface-800 bg-surface-100 antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-heading font-semibold tracking-tight;
+    }
+}
+
+@layer components {
+    /* KPI Card */
+    .kpi-card {
+        @apply bg-white rounded-card p-6 shadow-card border border-surface-100
+               transition-all duration-200 ease-out
+               hover:shadow-card-hover hover:-translate-y-0.5;
+    }
+
+    .kpi-card .kpi-icon {
+        @apply w-12 h-12 rounded-btn flex items-center justify-center;
+    }
+
+    .kpi-card .kpi-value {
+        @apply text-3xl font-heading font-bold tracking-tight text-surface-900 mt-3;
+    }
+
+    .kpi-card .kpi-label {
+        @apply text-sm font-medium text-surface-500 mt-1;
+    }
+
+    .kpi-card .kpi-trend {
+        @apply text-xs font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2;
+    }
+
+    .kpi-trend.up {
+        @apply text-success-dark bg-success-light;
+    }
+
+    .kpi-trend.down {
+        @apply text-danger-dark bg-danger-light;
+    }
+
+    /* Chart Container */
+    .chart-card {
+        @apply bg-white rounded-card p-6 shadow-card border border-surface-100;
+    }
+
+    .chart-card .chart-title {
+        @apply text-lg font-heading font-semibold text-surface-800 mb-1;
+    }
+
+    .chart-card .chart-subtitle {
+        @apply text-sm text-surface-500 mb-6;
+    }
+
+    /* Sidebar */
+    .sidebar-nav-item {
+        @apply flex items-center gap-3 px-4 py-3 rounded-btn text-sm font-medium
+               text-sidebar-text transition-all duration-200 ease-out
+               hover:bg-sidebar-hover hover:text-sidebar-textActive
+               relative;
+    }
+
+    .sidebar-nav-item.active {
+        @apply bg-sidebar-active text-sidebar-textActive;
+    }
+
+    .sidebar-nav-item.active::before {
+        content: '';
+        @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary-500 rounded-r-full;
+    }
+
+    /* Skeleton loaders */
+    .skeleton {
+        @apply animate-pulse bg-surface-200 rounded-btn;
+    }
+
+    /* Empty state */
+    .empty-state {
+        @apply flex flex-col items-center justify-center py-12 text-surface-400;
+    }
+
+    .empty-state svg {
+        @apply w-16 h-16 mb-4 opacity-60;
+    }
+
+    .empty-state p {
+        @apply text-sm font-medium;
+    }
+}
