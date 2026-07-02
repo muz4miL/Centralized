@@ -41,13 +41,16 @@
 | `app/Services/DashboardService.php` | All analytics: KPIs, Alerts, Campus Comparison, Trend, Fees, Exams |
 | `app/Http/Controllers/DashboardController.php` | Thin controller → calls DashboardService |
 | `app/Http/Controllers/AttendanceController.php` | Attendance drill-down: filter/sort/search/paginate |
+| `app/Http/Controllers/AcademicsController.php` | Academics drill-down: filter/sort/search/paginate |
+| `app/Http/Controllers/FinanceController.php` | Finance dashboard: Expected vs Collected metrics and trend |
+| `app/Http/Controllers/StaffController.php` | Staff directory management with role updates & account creation |
 | `app/Http/Middleware/CheckRole.php` | Route-level role guard: `role:admin`, `role:admin,principal` |
 | `app/Models/User.php` | `role` enum + `hasRole()`, `hasAnyRole()`, `isAdmin()` helpers |
 | `app/Models/AttendanceSummary.php` | Attendance summary model |
 | `app/Models/FeeSummary.php` | Fee summary model |
 | `app/Models/ExamSummary.php` | Exam summary model |
 | `config/database.php` | Adds `source_system_1`, `source_system_2` placeholder MySQL connections |
-| `routes/web.php` | `/`, `/dashboard`, `/attendance`, `/staff`, profile routes |
+| `routes/web.php` | Routing for all dashboard sections |
 | `bootstrap/app.php` | Registers `role` middleware alias |
 
 ### Frontend / Views
@@ -57,7 +60,9 @@
 | `resources/views/components/kpi-card.blade.php` | Reusable KPI card with icon/trend/color variants |
 | `resources/views/dashboard.blade.php` | Dashboard: KPIs → Alerts → Charts → Campus Comparison → Exam Table |
 | `resources/views/attendance/index.blade.php` | Attendance drill-down with filters, stats, sortable paginated table |
-| `resources/views/staff.blade.php` | Admin-only staff placeholder |
+| `resources/views/academics/index.blade.php` | Academics drill-down with KPIs, Chart.js class comparisons, paginated table |
+| `resources/views/finance/index.blade.php` | Finance dashboard with expected/collected target KPIs, monthly collection line, paginated table |
+| `resources/views/staff/index.blade.php` | Admin-only Staff directory grid, role update modals, safe user deletion, and add modals |
 | `resources/css/app.css` | Design system CSS: component classes, Google Fonts import |
 | `resources/js/app.js` | Alpine.js + Chart.js with themed global defaults |
 | `tailwind.config.js` | Full design tokens: colors, fonts, radii, shadows |
@@ -83,13 +88,6 @@ Trend arrows compare latest month vs previous month.
 
 ### Needs Attention Alerts Widget
 Auto-generated from thresholds (constants in `DashboardService`):
-```php
-const ATTENDANCE_WARNING_THRESHOLD = 75;
-const FEE_WARNING_THRESHOLD        = 70;
-const EXAM_WARNING_THRESHOLD       = 60;
-const SCORE_EXCELLENT              = 90;
-const SCORE_CRITICAL               = 75;
-```
 - Amber border = warning, Red border = critical (<50%)
 - Max 5 items shown, "View all" link if more
 - Each item has a "View →" link to filtered Attendance drill-down
@@ -123,12 +121,40 @@ Columns: Campus, Students, Attendance %, Fee Collection %, Pass Rate %, Health S
 
 ---
 
+## Academics Drill-Down (`/academics`)
+- **Filters:** Campus, Class, Date From, Date To, Class/Exam name search
+- **KPIs:** Avg Pass Rate, Avg Class Score, Best Performing Class name, Needs Improvement class name
+- **Charts:** Chart.js bar chart showing average pass rate across classes
+- **Table:** Exam / Campus / Class / Students / Pass % / Avg Score / Date
+  - All columns sortable (click header, toggles asc/desc)
+- **Pagination:** 15 records/page, custom UI
+
+---
+
+## Finance Drill-Down (`/finance`)
+- **Filters:** Campus, Date From, Date To
+- **KPIs:** Total Expected (₨), Total Collected (₨), Outstanding Balance (₨), Recovery Rate %
+- **Charts:** Target vs Recovery comparative bar chart per month
+- **Table:** Month / Campus / Expected Fee / Collected Fee / Outstanding / Collection %
+  - All columns sortable (click header, toggles asc/desc)
+- **Pagination:** 15 records/page, custom UI
+
+---
+
+## Staff Directory & Management (`/staff`)
+- **Features:** Only accessible to `admin` role users.
+- **Directories:** Search bar, role filter dropdown, profile initial avatar, joined date.
+- **Actions:** Add Staff Member modal, inline Change Role modal, Delete Staff Member modal (safe guard preventing deleting or updating one's own role).
+- **Pagination:** 10 records/page, custom UI
+
+---
+
 ## Role-Based Access
-| Role | Dashboard | Attendance | Staff |
-|---|---|---|---|
-| admin | ✅ | ✅ | ✅ |
-| principal | ✅ | ✅ | ❌ (403) |
-| teacher | ✅ | ✅ | ❌ (403) |
+| Role | Dashboard | Attendance | Academics | Finance | Staff |
+|---|---|---|---|---|---|
+| admin | ✅ | ✅ | ✅ | ✅ | ✅ |
+| principal | ✅ | ✅ | ✅ | ✅ | ❌ (403) |
+| teacher | ✅ | ✅ | ✅ | ✅ | ❌ (403) |
 
 Staff link hidden in sidebar for non-admins.
 
@@ -152,15 +178,3 @@ C:\xampp\php\php.exe artisan view:clear
 C:\xampp\php\php.exe artisan cache:clear
 C:\xampp\php\php.exe artisan config:clear
 ```
-
----
-
-## Multi-DB Architecture (Future)
-When ready to integrate external school systems, populate `.env`:
-```
-DB_SOURCE1_HOST=...
-DB_SOURCE1_DATABASE=...
-DB_SOURCE1_USERNAME=...
-DB_SOURCE1_PASSWORD=...
-```
-Then use `DB::connection('source_system_1')->table('...')->...` in dedicated service classes.

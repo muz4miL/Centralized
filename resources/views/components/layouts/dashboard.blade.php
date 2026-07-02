@@ -65,13 +65,13 @@
                         <span>Attendance</span>
                     </a>
 
-                    <a href="#" class="sidebar-nav-item">
+                    <a href="{{ route('academics') }}" class="sidebar-nav-item {{ request()->routeIs('academics') ? 'active' : '' }}">
                         {{-- Lucide: GraduationCap --}}
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
                         <span>Academics</span>
                     </a>
 
-                    <a href="#" class="sidebar-nav-item">
+                    <a href="{{ route('finance') }}" class="sidebar-nav-item {{ request()->routeIs('finance') ? 'active' : '' }}">
                         {{-- Lucide: Wallet --}}
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
                         <span>Finance</span>
