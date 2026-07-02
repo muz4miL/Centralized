@@ -160,21 +160,62 @@ Staff link hidden in sidebar for non-admins.
 
 ---
 
-## Dev Commands
+## How to Run Locally (Step-by-Step)
 
+To run the application locally on a new machine or working copy, follow these steps:
+
+### 1. Environment Configuration
+Copy the sample environment file and generate the application key:
 ```bash
-# Start dev server
-C:\xampp\php\php.exe artisan serve --port=8000
+cp .env.example .env
+C:\xampp\php\php.exe artisan key:generate
+```
+*Make sure to configure the database credentials in `.env` to point to your local MySQL/MariaDB server (e.g. `DB_DATABASE=centralized_dashboard`, `DB_USERNAME=root`, `DB_PASSWORD=`).*
 
-# Rebuild frontend assets
-npm run build        # production
-npm run dev          # hot-reload
+### 2. Dependency Installation
+Install all PHP and Javascript dependencies:
+```bash
+# Install PHP packages
+C:\laragon\bin\composer.phar install
 
-# Re-seed database (drops all tables)
+# Install Javascript packages
+npm install
+```
+
+### 3. Database Migration & Seeding
+Prepare the database tables and seed realistic school dashboard data:
+```bash
 C:\xampp\php\php.exe artisan migrate:fresh --seed
+```
 
-# Clear caches
+### 4. Running the Servers
+Open two terminal windows/tabs:
+
+- **Terminal 1: Artisan Local Dev Server**
+  ```bash
+  C:\xampp\php\php.exe artisan serve --port=8000
+  ```
+  *This hosts the site locally at `http://127.0.0.1:8000`.*
+
+- **Terminal 2: Vite Hot-Reload Assets Compiler**
+  ```bash
+  npm run dev
+  ```
+
+Alternatively, you can compile build assets for production once instead of running Vite hot-reload in Terminal 2:
+```bash
+npm run build
+```
+
+---
+
+## Troubleshooting & Cache Clearing Commands
+
+If you make modifications to views, configs, or routes, use these commands to clear cached files:
+```bash
 C:\xampp\php\php.exe artisan view:clear
 C:\xampp\php\php.exe artisan cache:clear
 C:\xampp\php\php.exe artisan config:clear
+C:\xampp\php\php.exe artisan route:clear
 ```
+
