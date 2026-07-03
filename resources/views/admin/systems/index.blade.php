@@ -4,6 +4,22 @@
         <div>
             <h1 class="text-2xl font-bold text-slate-900">System Management</h1>
             <p class="text-sm text-slate-600 mt-1">Manage systems and role-based access control</p>
+            
+            {{-- Inline Stats Summary --}}
+            <div class="flex items-center gap-6 mt-3 text-sm">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-500">Active Systems:</span>
+                    <span class="font-bold text-slate-900">{{ $systems->where('coming_soon', false)->count() }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-500">Roles Configured:</span>
+                    <span class="font-bold text-slate-900">{{ count($roles) }}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-slate-500">Permission Mappings:</span>
+                    <span class="font-bold text-slate-900">{{ \App\Models\RoleSystemAccess::count() }}</span>
+                </div>
+            </div>
         </div>
         <button 
             onclick="document.getElementById('addSystemModal').classList.remove('hidden')"
@@ -34,11 +50,51 @@
             </thead>
             <tbody class="divide-y divide-slate-200">
                 @foreach($systems as $system)
-                    <tr class="hover:bg-slate-50">
+                    @php
+                        // Determine system category and icon/color based on name
+                        $iconData = match(true) {
+                            str_contains(strtolower($system->name), 'analytic') || str_contains(strtolower($system->name), 'emis') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>',
+                                'bg' => 'bg-violet-100',
+                                'text' => 'text-violet-600'
+                            ],
+                            str_contains(strtolower($system->name), 'enrollment') || str_contains(strtolower($system->name), 'district') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+                                'bg' => 'bg-blue-100',
+                                'text' => 'text-blue-600'
+                            ],
+                            str_contains(strtolower($system->name), 'attendance') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>',
+                                'bg' => 'bg-blue-100',
+                                'text' => 'text-blue-600'
+                            ],
+                            str_contains(strtolower($system->name), 'budget') || str_contains(strtolower($system->name), 'grant') || str_contains(strtolower($system->name), 'financ') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>',
+                                'bg' => 'bg-amber-100',
+                                'text' => 'text-amber-600'
+                            ],
+                            str_contains(strtolower($system->name), 'facilitat') || str_contains(strtolower($system->name), 'director') || str_contains(strtolower($system->name), 'staff') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+                                'bg' => 'bg-blue-100',
+                                'text' => 'text-blue-600'
+                            ],
+                            str_contains(strtolower($system->name), 'exam') || str_contains(strtolower($system->name), 'academic') => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+                                'bg' => 'bg-teal-100',
+                                'text' => 'text-teal-600'
+                            ],
+                            default => [
+                                'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>',
+                                'bg' => 'bg-slate-100',
+                                'text' => 'text-slate-600'
+                            ]
+                        };
+                    @endphp
+                    <tr class="group hover:bg-{{ str_replace('bg-', '', $iconData['bg']) }}/10 transition-all duration-200 hover:shadow-sm">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: {{ $system->accent_color }}20;">
-                                    <span class="text-xl">📊</span>
+                                <div class="w-10 h-10 rounded-lg flex items-center justify-center {{ $iconData['bg'] }} {{ $iconData['text'] }} group-hover:scale-105 transition-transform">
+                                    {!! $iconData['icon'] !!}
                                 </div>
                                 <div>
                                     <div class="font-semibold text-slate-900">{{ $system->name }}</div>
@@ -53,8 +109,15 @@
                                     @php
                                         $roleObj = \App\Models\Role::where('slug', $accessItem->role)->first();
                                         $roleName = $roleObj ? $roleObj->name : ucfirst($accessItem->role);
+                                        
+                                        // Visual hierarchy for roles
+                                        $roleStyle = match(strtolower($accessItem->role)) {
+                                            'admin' => 'bg-primary-600 text-white font-bold',
+                                            'principal' => 'bg-primary-500 text-white font-semibold',
+                                            default => 'bg-primary-50 text-primary-700 border border-primary-200 font-medium'
+                                        };
                                     @endphp
-                                    <span class="px-2 py-1 bg-primary-100 text-primary-700 text-xs font-semibold rounded">
+                                    <span class="px-2.5 py-1 {{ $roleStyle }} text-xs rounded">
                                         {{ $roleName }}
                                     </span>
                                 @empty
@@ -65,9 +128,15 @@
 
                         <td class="px-6 py-4 text-center">
                             @if($system->coming_soon)
-                                <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded">Coming Soon</span>
+                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                                    Coming Soon
+                                </span>
                             @else
-                                <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">Active</span>
+                                <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    Active
+                                </span>
                             @endif
                         </td>
 
@@ -75,22 +144,47 @@
                             <div class="flex items-center justify-center gap-3">
                                 <button 
                                     onclick='openPermissionsModal({{ $system->id }}, "{{ addslashes($system->name) }}", @json($system->access->pluck("role")->toArray()))'
-                                    class="text-purple-600 hover:text-purple-700 font-medium text-sm"
+                                    class="text-purple-600 hover:text-purple-700 font-medium text-sm hover:underline"
                                 >
                                     Permissions
                                 </button>
-                                <button 
-                                    onclick="openEditModal({{ $system->id }}, '{{ addslashes($system->name) }}', '{{ $system->slug }}', '{{ addslashes($system->description) }}', '{{ $system->icon }}', '{{ $system->accent_color }}', {{ $system->coming_soon ? 'true' : 'false' }}, '{{ $system->launch_url }}', {{ $system->sort_order }})"
-                                    class="text-primary-600 hover:text-primary-700 font-medium text-sm"
-                                >
-                                    Edit
-                                </button>
-                                <button 
-                                    onclick="deleteSystem({{ $system->id }}, '{{ addslashes($system->name) }}')"
-                                    class="text-red-600 hover:text-red-700 font-medium text-sm"
-                                >
-                                    Delete
-                                </button>
+                                
+                                {{-- Overflow Menu --}}
+                                <div class="relative" x-data="{ open: false }">
+                                    <button 
+                                        @click="open = !open"
+                                        class="text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
+                                        </svg>
+                                    </button>
+                                    <div 
+                                        x-show="open" 
+                                        @click.outside="open = false"
+                                        x-transition:enter="transition ease-out duration-100"
+                                        x-transition:enter-start="opacity-0 scale-95"
+                                        x-transition:enter-end="opacity-100 scale-100"
+                                        x-transition:leave="transition ease-in duration-75"
+                                        x-transition:leave-start="opacity-100 scale-100"
+                                        x-transition:leave-end="opacity-0 scale-95"
+                                        class="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-10"
+                                        style="display: none;"
+                                    >
+                                        <button 
+                                            onclick="openEditModal({{ $system->id }}, '{{ addslashes($system->name) }}', '{{ $system->slug }}', '{{ addslashes($system->description) }}', '{{ $system->icon }}', '{{ $system->accent_color }}', {{ $system->coming_soon ? 'true' : 'false' }}, '{{ $system->launch_url }}', {{ $system->sort_order }})"
+                                            class="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button 
+                                            onclick="deleteSystem({{ $system->id }}, '{{ addslashes($system->name) }}')"
+                                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>

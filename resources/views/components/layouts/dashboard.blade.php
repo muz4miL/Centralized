@@ -132,7 +132,9 @@
                         <span x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">Facilitators</span>
                         <span x-show="!sidebarOpen" class="hidden lg:block absolute left-full ml-2 px-2 py-1 bg-surface-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50" style="display: none;">Facilitators</span>
                     </a>
+                    @endif
 
+                    @if(auth()->user()?->isAdmin() && request()->routeIs('admin.*'))
                     <div class="pt-4 mt-4 border-t border-surface-800">
                         <p x-show="sidebarOpen" class="px-4 text-xs font-semibold text-surface-500 uppercase tracking-wider mb-3">Admin Tools</p>
 
